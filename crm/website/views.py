@@ -1,10 +1,15 @@
 from django.shortcuts import render,redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
-from .forms import SignUpForm
+from .forms import SignUpForm,AddRecordForm
+from .models import Record
+from django.contrib.auth.decorators import login_required
 
+@login_required
 def home(request):
-    return render(request,'home.html')
+    records = Record.objects.all()
+    form = AddRecordForm()
+    return render(request,'home.html',{'records':records,'form':form})
 
 def login_user(request):
     if request.method == 'POST':
@@ -20,6 +25,7 @@ def login_user(request):
         
     return render(request,'auth/login.html')
 
+@login_required
 def logout_user(request):
     logout(request)
     messages.success(request,"Logged out successfully...")
@@ -40,5 +46,39 @@ def register_user(request):
         form = SignUpForm()
         return render(request,'auth/register.html',{'form':form})
     return render(request,'auth/register.html',{'form':form})
+
+@login_required
+def customer_record(request,pk):
+    record = Record.objects.get(id=pk)
+    form = AddRecordForm(request.POST or None,instance=record)
+    return render(request,'customers/show.html',{'record':record,'form':form})
+
+@login_required 
+def customer_record_delete(request,pk):
+    Record.objects.get(id=pk).delete()
+    messages.success(request,"Record was deleted successfully")
+    return redirect('home')
+
+@login_required
+def add_record(request):
+    if request.method == 'POST':
+            form = AddRecordForm(request.POST)
+            if form.is_valid():
+                form.save()
+                messages.success(request,"Record added successfully")
+                return redirect('home')
+    else: 
+        messages.error(request,"An error was encountered")
+        return redirect('home')
+    
+@login_required   
+def edit_record(request,pk):
+    record = Record.objects.get(id=pk)
+    form = AddRecordForm(request.POST or None,instance=record)
+    if form.is_valid():
+        form.save()
+        messages.success(request,"Record successfully updated")
+        return redirect("home")
+    
  
     

@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block 'content' %}
+<div class="card mb-3">
+
+    <div class="card-body">
+        <h5 class="card-title">{{record.created_at}}</h5>
+        <hr>
+        <p class="card-text">Full names: {{record}}</p>
+        <p class="card-text">Email: {{record.email}}</p>
+        <p class="card-text">Phone: {{record.phone}}</p>
+        <p class="card-text">Address: {{record.address}}</p>
+        <p class="card-text">City: {{record.city}}</p>
+        <p class="card-text">Postal code: {{record.postal_code}}</p>
+
+    </div>
+</div>
+<a href="{% url 'home' %}" class="btn btn-primary">Back</a>
+<a href="#" data-bs-toggle="modal" data-bs-target="#editModal" class="btn btn-dark">Edit</a>
+<a href="{% url 'delete_record' record.id %}" class="btn btn-danger">Delete</a>
+<!-- Modal -->
+<form action="{% url 'edit_record' record.id%}" method="POST">
+    {%csrf_token%}
+    <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="editModalLabel">Edit Customer</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    {{form.as_p}}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock %}
